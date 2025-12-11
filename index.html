@@ -2,650 +2,399 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Burger Station - Smash & Grill</title>
-    
-    <!-- Tailwind CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dom Barbeiro | Agendamento</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            DEFAULT: '#D97706', // Primary from Brief
-                            dark: '#B45309',
-                            light: '#FBBF24'
-                        },
-                        secondary: '#1F2937' // Secondary from Brief
+                        gold: '#D4AF37',
+                        dark: '#121212',
+                        surface: '#1E1E1E',
+                        highlight: '#2A2A2A'
                     },
-                    animation: {
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'slide-in': 'slideIn 0.3s ease-out forwards',
-                        'fade-in': 'fadeIn 0.2s ease-out forwards'
-                    },
-                    keyframes: {
-                        slideIn: {
-                            '0%': { transform: 'translateX(100%)' },
-                            '100%': { transform: 'translateX(0)' }
-                        },
-                        fadeIn: {
-                            '0%': { opacity: '0', transform: 'scale(0.95)' },
-                            '100%': { opacity: '1', transform: 'scale(1)' }
-                        }
+                    fontFamily: {
+                        sans: ['Roboto', 'sans-serif'],
+                        display: ['Oswald', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
-    
-    <!-- React & ReactDOM (UMD) -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
-    <!-- Babel Standalone (for JSX) -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
     <style>
-        /* Custom Utilities */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .scroll-snap-x { scroll-snap-type: x mandatory; }
-        .scroll-snap-center { scroll-snap-align: center; }
-        .text-shadow { text-shadow: 2px 2px 4px rgba(0,0,0,0.7); }
+        /* Custom Scrollbar Hide */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
         
-        body {
-            background-color: #f3f4f6;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
+        /* Smooth Fade In */
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Selection Ring Animation */
+        .selected-ring { box-shadow: 0 0 0 2px #D4AF37; transform: scale(1.02); }
+        
+        /* Glass effect for sticky footer */
+        .glass-footer {
+            background: rgba(18, 18, 18, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="bg-dark text-gray-200 font-sans antialiased pb-32">
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
-        const { ShoppingCart, Phone, Star, Plus, Minus, X, MapPin, Clock, Trash2, Edit3, CheckCircle2 } = lucide;
+    <!-- HERO SECTION -->
+    <header class="relative h-48 bg-surface overflow-hidden">
+        <img src="fundo.png" onerror="this.src='https://picsum.photos/800/400?grayscale'" class="absolute inset-0 w-full h-full object-cover opacity-30" alt="Background">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-dark"></div>
+        <div class="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center">
+            <img src="logo.png" onerror="this.style.display='none'" class="h-16 mb-2 rounded-full border-2 border-gold shadow-lg" alt="Logo">
+            <h1 class="text-3xl font-display font-bold text-white tracking-wide">DOM BARBEIRO</h1>
+            <p class="text-gold text-sm tracking-widest uppercase mt-1">Estilo & Tradição</p>
+            <div class="flex items-center gap-2 mt-3 text-xs text-gray-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span>Rua das Flores, 123</span>
+            </div>
+        </div>
+    </header>
 
+    <!-- MAIN APP CONTAINER -->
+    <main class="max-w-md mx-auto px-4 -mt-6 relative z-20 space-y-8">
+
+        <!-- 1. PROFISSIONAIS -->
+        <section id="step-professional" class="fade-in" style="animation-delay: 0.1s;">
+            <h2 class="text-white font-display text-lg mb-3 flex items-center gap-2">
+                <span class="bg-gold text-dark w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold">1</span>
+                ESCOLHA O PROFISSIONAL
+            </h2>
+            <div class="grid grid-cols-2 gap-4" id="professionals-container">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+        <!-- 2. SERVIÇOS -->
+        <section id="step-service" class="fade-in opacity-50 pointer-events-none transition-all duration-300" style="animation-delay: 0.2s;">
+            <h2 class="text-white font-display text-lg mb-3 flex items-center gap-2">
+                <span class="bg-gold text-dark w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold">2</span>
+                SELECIONE O SERVIÇO
+            </h2>
+            <div class="space-y-3" id="services-container">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+        <!-- 3. DATA -->
+        <section id="step-date" class="fade-in opacity-50 pointer-events-none transition-all duration-300" style="animation-delay: 0.3s;">
+            <h2 class="text-white font-display text-lg mb-3 flex items-center gap-2">
+                <span class="bg-gold text-dark w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold">3</span>
+                ESCOLHA A DATA
+            </h2>
+            <div class="flex overflow-x-auto gap-3 pb-2 hide-scroll" id="dates-container">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+        <!-- 4. HORÁRIO -->
+        <section id="step-time" class="fade-in opacity-50 pointer-events-none transition-all duration-300" style="animation-delay: 0.4s;">
+            <h2 class="text-white font-display text-lg mb-3 flex items-center gap-2">
+                <span class="bg-gold text-dark w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold">4</span>
+                HORÁRIO DISPONÍVEL
+            </h2>
+            <div class="grid grid-cols-4 gap-2" id="times-container">
+                <p class="col-span-4 text-gray-500 text-sm italic py-2">Selecione uma data e serviço para ver os horários.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- STICKY FOOTER -->
+    <footer class="fixed bottom-0 left-0 right-0 glass-footer border-t border-white/10 p-4 z-50 transition-transform duration-300 translate-y-full" id="booking-footer">
+        <div class="max-w-md mx-auto">
+            <div class="flex justify-between items-end mb-3 text-sm">
+                <div class="flex flex-col">
+                    <span class="text-gray-400 text-xs">RESUMO DO AGENDAMENTO</span>
+                    <strong class="text-white text-lg" id="summary-price">R$ 0,00</strong>
+                </div>
+                <div class="text-right">
+                    <div id="summary-date" class="text-gold font-bold">--/--</div>
+                    <div id="summary-time" class="text-gray-300 text-xs">--:--</div>
+                </div>
+            </div>
+            <button onclick="sendToWhatsApp()" class="w-full bg-gold hover:bg-yellow-600 text-dark font-bold font-display uppercase tracking-wider py-4 rounded-lg shadow-lg transform active:scale-95 transition-all flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-8.683-2.031-.967-.272-.099-.47-.149-.669.198-.199.347-.769.967-.943 1.165-.173.199-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.017-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                SOLICITAR AGENDAMENTO
+            </button>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
         // --- CONFIGURAÇÃO DO NEGÓCIO ---
-        const BUSINESS = {
-            name: "Burger Station",
-            subname: "Smash & Grill",
-            slogan: "Sabor que acelera",
-            whatsapp: "5592998877665",
-            niche: "Hamburgueria",
-            colors: {
-                primary: "#D97706",
-                secondary: "#1F2937"
-            },
-            hours: {
-                open: "18:00",
-                close: "23:45"
-            },
-            heroImage: "fachada-burger.png",
-            socialProof: {
-                video: "video1.mp4",
-                photo: "cliente.png"
-            }
+        const businessConfig = {
+            name: "Dom Barbeiro",
+            phone: "5511999999999", // Coloque o número real aqui
+            openHour: 9,
+            closeHour: 20,
+            daysOff: [0] // 0 = Domingo, 6 = Sábado. Ex: [0] fecha domingo
         };
 
-        const MENU = [
-            {
-                id: "smash-classic",
-                category: "Destaques",
-                name: "Smash Classic",
-                price: 22.90,
-                desc: "Carne 100g, queijo cheddar, cebola caramelizada, pão brioche",
-                image: "smashclassic.png"
-            },
-            {
-                id: "double-grill",
-                category: "Destaques",
-                name: "Double Grill",
-                price: 29.90,
-                desc: "Duas carnes 100g, cheddar duplo, bacon crocante, molho da casa",
-                image: "doublegrill.png"
-            },
-            {
-                id: "refri-lata",
-                category: "Bebidas",
-                name: "Refrigerante Lata",
-                price: 6.00,
-                desc: "Coca-cola, Guaraná ou Fanta (350ml)",
-                image: "refri.png"
-            },
-            {
-                id: "milkshake-choco",
-                category: "Bebidas",
-                name: "Milkshake Chocolate",
-                price: 14.90,
-                desc: "Sorvete de chocolate 50% cacau, chantilly e calda",
-                image: "milkshakechoco.png"
+        const professionals = [
+            { id: 1, name: "Carlos", photo: "barbeiro1.png" },
+            { id: 2, name: "Rafael", photo: "barbeiro2.png" }
+        ];
+
+        const services = [
+            { id: 1, name: "Corte Degrade", price: 35.00, duration: 40, photo: "corte.png" },
+            { id: 2, name: "Barba Terapia", price: 25.00, duration: 30, photo: "barba.png" },
+            { id: 3, name: "Combo Completo", price: 55.00, duration: 60, photo: "combo.png" }
+        ];
+
+        // --- ESTADO DA APLICAÇÃO ---
+        let selectedState = {
+            professional: null,
+            service: null,
+            date: null,
+            time: null
+        };
+
+        // --- INICIALIZAÇÃO ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProfessionals();
+            renderServices();
+            renderDates();
+        });
+
+        // --- FUNÇÕES DE RENDERIZAÇÃO ---
+
+        function renderProfessionals() {
+            const container = document.getElementById('professionals-container');
+            container.innerHTML = professionals.map(prof => `
+                <div onclick="selectProfessional(${prof.id})" id="prof-${prof.id}" class="cursor-pointer bg-surface rounded-xl p-3 border border-white/5 hover:border-gold/50 transition-all group relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gold/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <img src="${prof.photo}" onerror="this.src='https://picsum.photos/150/150?random=${prof.id}'" class="w-16 h-16 rounded-full mx-auto mb-2 object-cover border-2 border-gray-700 group-hover:border-gold transition-colors">
+                    <h3 class="text-center font-display text-white group-hover:text-gold transition-colors">${prof.name}</h3>
+                </div>
+            `).join('');
+        }
+
+        function renderServices() {
+            const container = document.getElementById('services-container');
+            container.innerHTML = services.map(svc => `
+                <div onclick="selectService(${svc.id})" id="svc-${svc.id}" class="cursor-pointer bg-surface rounded-xl p-4 flex items-center justify-between border border-white/5 hover:border-gold/50 transition-all group">
+                    <div class="flex items-center gap-3">
+                        <img src="${svc.photo}" onerror="this.src='https://picsum.photos/100/100?random=${svc.id + 10}'" class="w-12 h-12 rounded-lg object-cover bg-dark">
+                        <div>
+                            <h3 class="font-display text-white group-hover:text-gold transition-colors">${svc.name}</h3>
+                            <p class="text-xs text-gray-500">${svc.duration} min • Detalhado</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="block text-gold font-bold">R$ ${svc.price.toFixed(2).replace('.', ',')}</span>
+                        <div class="w-4 h-4 rounded-full border border-gray-600 ml-auto mt-1 group-hover:bg-gold group-hover:border-gold transition-colors flex items-center justify-center">
+                            <div class="w-2 h-2 bg-dark rounded-full opacity-0 group-hover:opacity-100"></div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderDates() {
+            const container = document.getElementById('dates-container');
+            const today = new Date();
+            const days = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+            let html = '';
+
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
+                
+                const dayOfWeek = date.getDay();
+                // Pular dias de folga
+                if (businessConfig.daysOff.includes(dayOfWeek)) continue;
+
+                const dayStr = days[dayOfWeek];
+                const dateStr = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+                const fullDate = date.toISOString().split('T')[0]; // YYYY-MM-DD
+
+                html += `
+                    <div onclick="selectDate('${fullDate}', '${dayStr} ${dateStr}', this)" class="date-card cursor-pointer min-w-[80px] bg-surface rounded-xl p-3 flex flex-col items-center border border-white/5 hover:border-gold/50 transition-all flex-shrink-0 group">
+                        <span class="text-xs text-gray-400 font-bold mb-1 group-hover:text-gold">${dayStr}</span>
+                        <span class="text-lg text-white font-display font-bold">${dateStr.split('/')[0]}</span>
+                        <span class="text-[10px] text-gray-500">${dateStr.split('/')[1]}</span>
+                    </div>
+                `;
             }
-        ];
+            container.innerHTML = html;
+        }
 
-        // Adicionais Genéricos para Exemplo
-        const EXTRAS_OPTIONS = [
-            { id: 'bacon', name: 'Bacon Extra', price: 3.00 },
-            { id: 'cheese', name: 'Queijo Extra', price: 2.00 },
-            { id: 'sauce', name: 'Molho Especial', price: 1.50 }
-        ];
-
-        // --- COMPONENTES PRINCIPAIS ---
-
-        const App = () => {
-            // Estado do Carrinho (Array para permitir itens iguais com obs diferentes)
-            const [cart, setCart] = useState([]); 
-            const [isCartOpen, setIsCartOpen] = useState(false);
-            const [isOpen, setIsOpen] = useState(false); // Loja aberta/fechada
-            const [address, setAddress] = useState(''); // Endereço de entrega
+        function renderTimeSlots() {
+            const container = document.getElementById('times-container');
             
-            // Estado do Modal de Produto
-            const [activeProduct, setActiveProduct] = useState(null); // Produto sendo editado
-            const [modalQty, setModalQty] = useState(1);
-            const [modalObs, setModalObs] = useState('');
-            const [modalExtras, setModalExtras] = useState([]); // Array de IDs
+            if (!selectedState.service) {
+                container.innerHTML = '<p class="col-span-4 text-gray-500 text-sm italic py-2">Selecione um serviço primeiro.</p>';
+                return;
+            }
 
-            // Hook para verificar horário de funcionamento
-            useEffect(() => {
-                const checkStatus = () => {
-                    const now = new Date();
-                    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-                    
-                    const [openH, openM] = BUSINESS.hours.open.split(':').map(Number);
-                    const [closeH, closeM] = BUSINESS.hours.close.split(':').map(Number);
-                    
-                    const startMinutes = openH * 60 + openM;
-                    const endMinutes = closeH * 60 + closeM;
+            const serviceDuration = services.find(s => s.id === selectedState.service).duration;
+            const startMinutes = businessConfig.openHour * 60;
+            const endMinutes = businessConfig.closeHour * 60;
+            
+            let current = startMinutes;
+            let html = '';
 
-                    // Lógica simples para o mesmo dia
-                    const isBusinessOpen = currentMinutes >= startMinutes && currentMinutes < endMinutes;
-                    setIsOpen(isBusinessOpen);
-                };
+            while (current + serviceDuration <= endMinutes) {
+                const h = Math.floor(current / 60);
+                const m = current % 60;
+                const timeLabel = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+                
+                html += `
+                    <button onclick="selectTime('${timeLabel}', this)" class="time-slot bg-surface hover:bg-highlight border border-white/10 text-white text-sm py-2 rounded-lg transition-all focus:outline-none">
+                        ${timeLabel}
+                    </button>
+                `;
+                
+                // Intervalo inteligente: soma a duração do serviço
+                current += serviceDuration; 
+            }
+            
+            container.innerHTML = html;
+        }
 
-                checkStatus();
-                const timer = setInterval(checkStatus, 60000); 
-                return () => clearInterval(timer);
-            }, []);
+        // --- LÓGICA DE SELEÇÃO ---
 
-            // Atualiza ícones quando o DOM muda
-            useEffect(() => {
-                lucide.createIcons();
+        function selectProfessional(id) {
+            selectedState.professional = id;
+            
+            // UI Update
+            document.querySelectorAll('#professionals-container > div').forEach(el => el.classList.remove('selected-ring', 'bg-highlight'));
+            const card = document.getElementById(`prof-${id}`);
+            card.classList.add('selected-ring', 'bg-highlight');
+
+            unlockSection('step-service');
+            updateFooter();
+        }
+
+        function selectService(id) {
+            selectedState.service = id;
+            selectedState.time = null; // Reset time if service changes (duration changes)
+            
+            // UI Update
+            document.querySelectorAll('#services-container > div').forEach(el => {
+                el.classList.remove('border-gold', 'bg-highlight');
+                el.querySelector('.w-4').classList.remove('bg-gold', 'border-gold');
+                el.querySelector('.w-2').classList.add('opacity-0');
+            });
+            const card = document.getElementById(`svc-${id}`);
+            card.classList.add('border-gold', 'bg-highlight');
+            card.querySelector('.w-4').classList.add('bg-gold', 'border-gold');
+            card.querySelector('.w-2').classList.remove('opacity-0');
+
+            unlockSection('step-date');
+            
+            // If date is already selected, re-render times because duration changed
+            if (selectedState.date) {
+                renderTimeSlots();
+                unlockSection('step-time');
+            }
+            
+            updateFooter();
+        }
+
+        function selectDate(isoDate, displayDate, element) {
+            selectedState.date = displayDate;
+            
+            // UI Update
+            document.querySelectorAll('.date-card').forEach(el => el.classList.remove('bg-gold', 'text-dark', 'border-gold'));
+            // Remove text classes from children to avoid conflict when parent is active
+            document.querySelectorAll('.date-card span').forEach(el => el.classList.remove('text-dark'));
+            
+            element.classList.remove('bg-surface', 'text-white');
+            element.classList.add('bg-gold', 'text-dark', 'border-gold', 'selected-ring');
+            
+            // Set children colors for contrast
+            const spans = element.querySelectorAll('span');
+            spans.forEach(s => {
+                s.classList.remove('text-gray-400', 'text-gray-500', 'text-white');
+                s.classList.add('text-dark');
             });
 
-            // --- LÓGICA DO MODAL ---
+            unlockSection('step-time');
+            renderTimeSlots();
+            updateFooter();
+        }
+
+        function selectTime(time, element) {
+            selectedState.time = time;
             
-            const openProductModal = (product) => {
-                if (!isOpen) return; // Bloqueia se fechado
-                setActiveProduct(product);
-                setModalQty(1);
-                setModalObs('');
-                setModalExtras([]);
-            };
+            // UI Update
+            document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('bg-gold', 'text-dark', 'font-bold'));
+            element.classList.remove('bg-surface', 'text-white');
+            element.classList.add('bg-gold', 'text-dark', 'font-bold');
 
-            const closeProductModal = () => {
-                setActiveProduct(null);
-            };
+            showFooter();
+            updateFooter();
+        }
 
-            const toggleExtra = (extraId) => {
-                setModalExtras(prev => 
-                    prev.includes(extraId) 
-                        ? prev.filter(id => id !== extraId) 
-                        : [...prev, extraId]
-                );
-            };
+        // --- AUXILIARES UI ---
 
-            const confirmAddToOrder = () => {
-                if (!activeProduct) return;
+        function unlockSection(id) {
+            const section = document.getElementById(id);
+            section.classList.remove('opacity-50', 'pointer-events-none');
+        }
 
-                const selectedExtrasObjs = EXTRAS_OPTIONS.filter(e => modalExtras.includes(e.id));
-                const extrasTotal = selectedExtrasObjs.reduce((acc, curr) => acc + curr.price, 0);
-                const unitPrice = activeProduct.price + extrasTotal;
+        function showFooter() {
+            document.getElementById('booking-footer').classList.remove('translate-y-full');
+        }
 
-                const newItem = {
-                    cartId: Date.now() + Math.random(), // ID único para o item no carrinho
-                    product: activeProduct,
-                    qty: modalQty,
-                    obs: modalObs,
-                    extras: selectedExtrasObjs,
-                    unitPrice: unitPrice,
-                    totalPrice: unitPrice * modalQty
-                };
+        function updateFooter() {
+            if (selectedState.service) {
+                const svc = services.find(s => s.id === selectedState.service);
+                document.getElementById('summary-price').innerText = `R$ ${svc.price.toFixed(2).replace('.', ',')}`;
+            }
+            
+            if (selectedState.date) {
+                document.getElementById('summary-date').innerText = selectedState.date;
+            }
+            
+            if (selectedState.time) {
+                document.getElementById('summary-time').innerText = selectedState.time;
+            }
+        }
 
-                setCart(prev => [...prev, newItem]);
-                
-                // Feedback e Fechar
-                if (navigator.vibrate) navigator.vibrate(50);
-                closeProductModal();
-                setIsCartOpen(true); // Opcional: abre o carrinho automaticamente
-            };
+        // --- FINALIZAÇÃO ---
 
-            // --- LÓGICA DO CARRINHO ---
+        function sendToWhatsApp() {
+            if (!selectedState.professional || !selectedState.service || !selectedState.date || !selectedState.time) {
+                alert("Por favor, selecione todas as opções.");
+                return;
+            }
 
-            const removeFromCart = (cartId) => {
-                setCart(prev => prev.filter(item => item.cartId !== cartId));
-            };
+            const prof = professionals.find(p => p.id === selectedState.professional);
+            const svc = services.find(s => s.id === selectedState.service);
 
-            // Totais
-            const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
-            const subTotal = cart.reduce((acc, item) => acc + item.totalPrice, 0);
+            // Construct Message
+            // Usando Unicode Escapes para garantir que os emojis funcionem
+            // independente da codificação do arquivo.
+            // 💈 = \uD83D\uDC88
+            // ✂️ = \u2702\uFE0F
+            // 💰 = \uD83D\uDCB0
+            // 📅 = \uD83D\uDCC5
+            // ⏰ = \u23F0
+            
+            const text = `*NOVO AGENDAMENTO*\n\n` +
+                `\uD83D\uDC88 *Barbeiro:* ${prof.name}\n` +
+                `\u2702\uFE0F *Serviço:* ${svc.name}\n` +
+                `\uD83D\uDCB0 *Valor:* R$ ${svc.price.toFixed(2).replace('.', ',')}\n` +
+                `\uD83D\uDCC5 *Data:* ${selectedState.date}\n` +
+                `\u23F0 *Horário:* ${selectedState.time}\n\n` +
+                `_Gostaria de confirmar este horário?_`;
 
-            // Checkout WhatsApp
-            const handleCheckout = () => {
-                if (cart.length === 0) return;
-                
-                if (!address.trim()) {
-                    alert("Por favor, preencha o endereço de entrega!");
-                    return;
-                }
-
-                let message = `*Olá, ${BUSINESS.name}! Gostaria de fazer um pedido:*\n\n`;
-                
-                cart.forEach(item => {
-                    message += `*${item.qty}x ${item.product.name}*\n`;
-                    
-                    // Listar Extras
-                    if (item.extras.length > 0) {
-                        item.extras.forEach(ext => {
-                            message += `  + ${ext.name}\n`;
-                        });
-                    }
-                    
-                    // Observação
-                    if (item.obs) {
-                        message += `  _Obs: ${item.obs}_\n`;
-                    }
-                    
-                    message += `  Valor: R$ ${item.totalPrice.toFixed(2)}\n\n`;
-                });
-
-                message += `*Total Geral: R$ ${subTotal.toFixed(2)}*\n\n`;
-                message += `📍 *Endereço de entrega:*\n${address}\n\n`;
-                message += `Aguardo confirmação!`;
-
-                const link = `https://wa.me/${BUSINESS.whatsapp}?text=${encodeURIComponent(message)}`;
-                window.open(link, '_blank');
-            };
-
-            const handleImageError = (e) => {
-                e.target.src = `https://picsum.photos/400/300?random=${Math.random()}`;
-                e.target.onerror = null;
-            };
-
-            // Cálculo de Preço no Modal
-            const currentModalPrice = activeProduct 
-                ? (activeProduct.price + EXTRAS_OPTIONS.filter(e => modalExtras.includes(e.id)).reduce((a,b)=>a+b.price,0)) * modalQty
-                : 0;
-
-            return (
-                <div className="pb-32 font-sans text-gray-800">
-                    
-                    {/* --- NAVBAR FIXA --- */}
-                    <nav className="fixed top-0 inset-x-0 z-40 bg-secondary text-white shadow-xl h-16 flex items-center justify-between px-4"
-                         style={{ backgroundColor: BUSINESS.colors.secondary }}>
-                        <div className="flex items-center gap-2 bg-black/20 py-1 px-3 rounded-full">
-                            <div className={`w-3 h-3 rounded-full shadow-lg ${isOpen ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
-                            <span className="text-xs font-bold tracking-wider">
-                                {isOpen ? `${BUSINESS.niche.toUpperCase()} ABERTA` : 'FECHADO AGORA'}
-                            </span>
-                        </div>
-                        
-                        <button onClick={() => setIsCartOpen(true)} className="relative p-2 active:scale-95 transition-transform">
-                            <i data-lucide="shopping-cart" className="w-6 h-6 text-white"></i>
-                            {totalItems > 0 && (
-                                <span className="absolute top-1 right-0 bg-brand text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-secondary animate-bounce"
-                                      style={{ backgroundColor: BUSINESS.colors.primary, borderColor: BUSINESS.colors.secondary }}>
-                                    {totalItems}
-                                </span>
-                            )}
-                        </button>
-                    </nav>
-
-                    {/* --- HERO SECTION --- */}
-                    <header className="relative mt-16 h-72 md:h-96 w-full overflow-hidden">
-                        <img 
-                            src={BUSINESS.heroImage} 
-                            onError={handleImageError}
-                            className="w-full h-full object-cover brightness-[0.4]"
-                            alt="Fachada"
-                        />
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                            <h1 className="text-4xl md:text-6xl font-extrabold text-white text-shadow tracking-tight mb-2">
-                                {BUSINESS.name}
-                            </h1>
-                            <h2 className="text-xl md:text-3xl text-brand font-light mb-4" style={{ color: BUSINESS.colors.primary }}>
-                                {BUSINESS.subname}
-                            </h2>
-                            <span className="bg-white/10 backdrop-blur-md text-white px-4 py-1 rounded-full text-sm font-medium border border-white/20">
-                                {BUSINESS.slogan}
-                            </span>
-                            <div className="mt-4 flex items-center gap-2 text-gray-300 text-xs md:text-sm bg-black/60 px-3 py-1 rounded">
-                                <i data-lucide="clock" className="w-3 h-3"></i>
-                                {BUSINESS.hours.open} às {BUSINESS.hours.close} • Todos os dias
-                            </div>
-                        </div>
-                    </header>
-
-                    {/* --- MENU (CARROSSEL HORIZONTAL) --- */}
-                    <main className="max-w-4xl mx-auto px-4 py-8 space-y-10">
-                        
-                        {/* Categoria: Destaques */}
-                        <section>
-                            <h3 className="text-2xl font-bold mb-4 flex items-center gap-2 text-secondary">
-                                <span className="w-2 h-8 rounded-full" style={{ backgroundColor: BUSINESS.colors.primary }}></span>
-                                🔥 Destaques
-                            </h3>
-                            
-                            <div className="flex overflow-x-auto gap-4 pb-6 px-1 -mx-4 md:mx-0 px-4 md:px-0 no-scrollbar scroll-snap-x">
-                                {MENU.filter(p => p.category === 'Destaques').map(product => (
-                                    <div key={product.id} className="min-w-[85vw] md:min-w-[320px] bg-white rounded-2xl shadow-lg overflow-hidden scroll-snap-center flex flex-col border border-gray-100 group">
-                                        <div className="h-48 overflow-hidden relative">
-                                            <img 
-                                                src={product.image} 
-                                                onError={handleImageError}
-                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                                alt={product.name}
-                                            />
-                                            {!isOpen && (
-                                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                                                    <span className="text-white font-bold border border-white px-3 py-1 rounded uppercase text-sm">Fechado</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="p-5 flex-1 flex flex-col justify-between">
-                                            <div>
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <h4 className="font-bold text-lg leading-tight text-gray-900">{product.name}</h4>
-                                                    <span className="font-bold text-lg whitespace-nowrap" style={{ color: BUSINESS.colors.primary }}>
-                                                        R$ {product.price.toFixed(2)}
-                                                    </span>
-                                                </div>
-                                                <p className="text-gray-500 text-sm leading-relaxed mb-4">{product.desc}</p>
-                                            </div>
-                                            <button 
-                                                onClick={() => openProductModal(product)}
-                                                disabled={!isOpen}
-                                                className={`w-full py-3 rounded-xl font-bold text-white shadow transition-all active:scale-95 flex justify-center items-center gap-2
-                                                    ${isOpen ? 'hover:brightness-110' : 'cursor-not-allowed opacity-50'}`}
-                                                style={{ backgroundColor: isOpen ? BUSINESS.colors.primary : '#9ca3af' }}
-                                            >
-                                                {isOpen ? <><i data-lucide="plus" className="w-4 h-4"></i> Montar Pedido</> : 'Indisponível'}
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* Categoria: Bebidas */}
-                        <section>
-                            <h3 className="text-2xl font-bold mb-4 flex items-center gap-2 text-secondary">
-                                <span className="w-2 h-8 rounded-full" style={{ backgroundColor: BUSINESS.colors.primary }}></span>
-                                🥤 Bebidas
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {MENU.filter(p => p.category === 'Bebidas').map(product => (
-                                    <div key={product.id} 
-                                         onClick={() => isOpen && openProductModal(product)}
-                                         className={`bg-white p-4 rounded-xl shadow-md flex items-center gap-4 border border-gray-100 transition active:scale-[0.98] ${isOpen ? 'cursor-pointer hover:shadow-lg' : 'opacity-70 grayscale'}`}>
-                                        <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 relative">
-                                            <img 
-                                                src={product.image} 
-                                                onError={handleImageError}
-                                                className="w-full h-full object-cover"
-                                                alt={product.name}
-                                            />
-                                        </div>
-                                        <div className="flex-1">
-                                            <h4 className="font-bold text-gray-900">{product.name}</h4>
-                                            <p className="text-xs text-gray-500 mb-2">{product.desc || 'Refrescante e gelado.'}</p>
-                                            <div className="flex justify-between items-center">
-                                                <span className="font-bold" style={{ color: BUSINESS.colors.primary }}>
-                                                    R$ {product.price.toFixed(2)}
-                                                </span>
-                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white shadow-sm ${!isOpen ? 'bg-gray-400' : ''}`}
-                                                      style={{ backgroundColor: isOpen ? BUSINESS.colors.primary : undefined }}>
-                                                    <i data-lucide="plus" className="w-4 h-4"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* Provas Sociais */}
-                        <section className="bg-white p-6 rounded-2xl shadow-lg text-center border-t-4" style={{ borderColor: BUSINESS.colors.primary }}>
-                            <h3 className="text-xl font-bold mb-6 flex justify-center items-center gap-2 text-gray-800">
-                                <i data-lucide="star" className="fill-yellow-400 text-yellow-400"></i>
-                                Quem pede, recomenda!
-                                <i data-lucide="star" className="fill-yellow-400 text-yellow-400"></i>
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="rounded-xl overflow-hidden shadow-inner bg-black aspect-video relative group">
-                                    <video controls className="w-full h-full object-cover">
-                                        <source src={BUSINESS.socialProof.video} type="video/mp4" />
-                                        Seu navegador não suporta vídeo.
-                                    </video>
-                                </div>
-                                <div className="rounded-xl overflow-hidden shadow-inner aspect-video">
-                                    <img 
-                                        src={BUSINESS.socialProof.photo} 
-                                        onError={handleImageError}
-                                        className="w-full h-full object-cover hover:scale-105 transition duration-700"
-                                        alt="Cliente feliz"
-                                    />
-                                </div>
-                            </div>
-                        </section>
-                    </main>
-
-                    {/* --- PRODUCT MODAL (POP-UP) --- */}
-                    {activeProduct && (
-                        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-                            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fade-in" onClick={closeProductModal}></div>
-                            
-                            <div className="relative bg-white w-full max-w-md max-h-[90vh] rounded-2xl shadow-2xl overflow-y-auto flex flex-col animate-fade-in no-scrollbar">
-                                {/* Header Modal */}
-                                <div className="relative h-48 flex-shrink-0">
-                                    <img 
-                                        src={activeProduct.image} 
-                                        onError={handleImageError}
-                                        className="w-full h-full object-cover" 
-                                    />
-                                    <button onClick={closeProductModal} className="absolute top-4 right-4 bg-white/90 p-2 rounded-full shadow-lg text-gray-800 hover:bg-white transition">
-                                        <i data-lucide="x" className="w-5 h-5"></i>
-                                    </button>
-                                </div>
-
-                                <div className="p-6 space-y-6">
-                                    {/* Info */}
-                                    <div>
-                                        <h3 className="text-2xl font-bold text-gray-900 leading-tight">{activeProduct.name}</h3>
-                                        <p className="text-gray-500 mt-1">{activeProduct.desc}</p>
-                                        <p className="text-xl font-bold mt-2" style={{ color: BUSINESS.colors.primary }}>
-                                            R$ {activeProduct.price.toFixed(2)}
-                                        </p>
-                                    </div>
-
-                                    {/* Adicionais (Apenas se for comida/destaque) */}
-                                    {activeProduct.category === 'Destaques' && (
-                                        <div>
-                                            <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                                                <i data-lucide="plus" className="w-4 h-4"></i> Adicionais
-                                            </h4>
-                                            <div className="space-y-2">
-                                                {EXTRAS_OPTIONS.map(extra => (
-                                                    <label key={extra.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className={`w-5 h-5 rounded border flex items-center justify-center transition ${modalExtras.includes(extra.id) ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 bg-white'}`}>
-                                                                {modalExtras.includes(extra.id) && <i data-lucide="check-circle-2" className="w-4 h-4"></i>}
-                                                            </div>
-                                                            <input type="checkbox" className="hidden" 
-                                                                checked={modalExtras.includes(extra.id)}
-                                                                onChange={() => toggleExtra(extra.id)}
-                                                            />
-                                                            <span className="text-gray-700">{extra.name}</span>
-                                                        </div>
-                                                        <span className="font-semibold text-gray-600">+ R$ {extra.price.toFixed(2)}</span>
-                                                    </label>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Observação */}
-                                    <div>
-                                        <h4 className="font-bold text-gray-800 mb-2 flex items-center gap-2">
-                                            <i data-lucide="edit-3" className="w-4 h-4"></i> Observações
-                                        </h4>
-                                        <textarea 
-                                            placeholder="Ex: Tirar a cebola, ponto da carne..."
-                                            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none h-24 text-sm"
-                                            value={modalObs}
-                                            onChange={(e) => setModalObs(e.target.value)}
-                                        ></textarea>
-                                    </div>
-
-                                    {/* Footer Actions */}
-                                    <div className="pt-4 border-t border-gray-100 flex items-center gap-4">
-                                        <div className="flex items-center border border-gray-200 rounded-lg h-12">
-                                            <button 
-                                                onClick={() => setModalQty(Math.max(1, modalQty - 1))}
-                                                className="w-10 h-full flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-l-lg"
-                                            >
-                                                <i data-lucide="minus" className="w-4 h-4"></i>
-                                            </button>
-                                            <span className="w-10 text-center font-bold text-lg">{modalQty}</span>
-                                            <button 
-                                                onClick={() => setModalQty(modalQty + 1)}
-                                                className="w-10 h-full flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-r-lg"
-                                            >
-                                                <i data-lucide="plus" className="w-4 h-4"></i>
-                                            </button>
-                                        </div>
-                                        
-                                        <button 
-                                            onClick={confirmAddToOrder}
-                                            className="flex-1 h-12 rounded-lg text-white font-bold shadow-lg active:scale-95 transition flex justify-center items-center gap-2"
-                                            style={{ backgroundColor: BUSINESS.colors.primary }}
-                                        >
-                                            Adicionar • R$ {currentModalPrice.toFixed(2)}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* --- CART SIDEBAR / DRAWER --- */}
-                    {isCartOpen && (
-                        <div className="fixed inset-0 z-[60] flex justify-end">
-                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setIsCartOpen(false)}></div>
-                            
-                            <div className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-slide-in">
-                                <div className="p-4 bg-secondary text-white flex justify-between items-center shadow-md" style={{ backgroundColor: BUSINESS.colors.secondary }}>
-                                    <h2 className="text-lg font-bold flex items-center gap-2">
-                                        <i data-lucide="shopping-cart" className="w-5 h-5"></i>
-                                        Seu Pedido
-                                    </h2>
-                                    <button onClick={() => setIsCartOpen(false)} className="p-2 hover:bg-white/20 rounded-full transition">
-                                        <i data-lucide="x" className="w-5 h-5"></i>
-                                    </button>
-                                </div>
-
-                                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-                                    {cart.length === 0 ? (
-                                        <div className="h-full flex flex-col items-center justify-center text-gray-400 opacity-70">
-                                            <i data-lucide="shopping-cart" className="w-16 h-16 mb-4 text-gray-300"></i>
-                                            <p>Seu carrinho está vazio.</p>
-                                        </div>
-                                    ) : (
-                                        cart.map((item, index) => (
-                                            <div key={item.cartId} className="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
-                                                <div className="flex gap-3">
-                                                    <div className="w-16 h-16 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
-                                                        <img src={item.product.image} onError={handleImageError} className="w-full h-full object-cover" />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <div className="flex justify-between items-start">
-                                                            <h4 className="font-bold text-sm text-gray-800 line-clamp-1">{item.product.name}</h4>
-                                                            <span className="font-bold text-sm" style={{ color: BUSINESS.colors.primary }}>
-                                                                R$ {item.totalPrice.toFixed(2)}
-                                                            </span>
-                                                        </div>
-                                                        
-                                                        <div className="text-xs text-gray-500 mt-1 space-y-1">
-                                                            {item.extras.map(ex => (
-                                                                <div key={ex.id} className="flex items-center gap-1">
-                                                                    <i data-lucide="plus" className="w-3 h-3 text-green-600"></i> {ex.name}
-                                                                </div>
-                                                            ))}
-                                                            {item.obs && (
-                                                                <div className="text-amber-700 bg-amber-50 p-1 rounded italic">
-                                                                    "{item.obs}"
-                                                                </div>
-                                                            )}
-                                                        </div>
-
-                                                        <div className="flex justify-between items-center mt-3">
-                                                            <span className="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">Qtd: {item.qty}</span>
-                                                            <button 
-                                                                onClick={() => removeFromCart(item.cartId)} 
-                                                                className="text-red-500 hover:text-red-700 p-1"
-                                                            >
-                                                                <i data-lucide="trash-2" className="w-4 h-4"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-
-                                <div className="p-6 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-                                    {/* Input de Endereço */}
-                                    <div className="mb-4">
-                                        <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                                            <i data-lucide="map-pin" className="w-4 h-4"></i>
-                                            Endereço de Entrega <span className="text-red-500">*</span>
-                                        </label>
-                                        <textarea
-                                            value={address}
-                                            onChange={(e) => setAddress(e.target.value)}
-                                            placeholder="Digite rua, número, bairro e referência..."
-                                            className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 resize-none h-20 text-sm"
-                                        ></textarea>
-                                    </div>
-
-                                    <div className="flex justify-between items-center mb-6 text-xl font-bold text-gray-800">
-                                        <span>Total</span>
-                                        <span style={{ color: BUSINESS.colors.primary }}>R$ {subTotal.toFixed(2)}</span>
-                                    </div>
-                                    <button 
-                                        onClick={handleCheckout}
-                                        disabled={cart.length === 0 || !address.trim()}
-                                        className={`w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg flex justify-center items-center gap-3 transition transform active:scale-95 ${(!address.trim() || cart.length === 0) ? 'opacity-50 cursor-not-allowed grayscale' : 'hover:opacity-90'}`}
-                                        style={{ backgroundColor: (!address.trim() || cart.length === 0) ? '#9ca3af' : '#25D366' }}
-                                    >
-                                        <i data-lucide="phone" className="w-5 h-5 fill-current"></i>
-                                        Enviar Pedido no Zap
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+            const url = `https://wa.me/${businessConfig.phone}?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
     </script>
 </body>
 </html>
